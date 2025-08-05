@@ -1,0 +1,19 @@
+graphhopper:
+  datareader.file: /data/yemen-latest.osm.pbf
+  graph.location: /data/gh-cache
+  graph.flag_encoders: car
+  prepare.ch.weightings: fastest
+  profiles:
+    - name: car
+      vehicle: car
+      weighting: fastest
+  profile: car
+  web.enable: true
+server:
+  application_connectors:
+    - type: http
+      port: 8989
+  admin_connectors:
+    - type: http
+      port: 8990
+
