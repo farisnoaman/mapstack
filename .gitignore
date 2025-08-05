@@ -1,0 +1,11 @@
+.env
+pgdata/
+graphhopper-data/
+nominatim-data/
+tileserver-data/
+*.log
+*.bak
+*.swp
+*.tmp
+node_modules/
+

@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  graphhopper:
+    image: mouhamedtec/graphhopper:latest
+    container_name: graphhopper
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    volumes:
+      - ./graphhopper-data:/data
+    environment:
+      - JAVA_OPTS=-Xmx2g
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.graphhopper.rule=Host(`${GRAPHHOPPER_DOMAIN}`)
+      - traefik.http.routers.graphhopper.entrypoints=websecure
+      - traefik.http.routers.graphhopper.tls=true
+      - traefik.http.services.graphhopper.loadbalancer.server.port=8989
+
+  nominatim:
+    image: mediagis/nominatim:4.1
+    container_name: nominatim
+    restart: unless-stopped
+    volumes:
+      - ./nominatim-data:/data
+    environment:
+      - POSTGRES_PASSWORD=${NOMINATIM_PG_PASSWORD}
+      - PBF=/data/yemen-latest.osm.pbf
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nominatim.rule=Host(`${NOMINATIM_DOMAIN}`)
+      - traefik.http.routers.nominatim.entrypoints=websecure
+      - traefik.http.routers.nominatim.tls=true
+      - traefik.http.services.nominatim.loadbalancer.server.port=8080
+
+  tileserver:
+    image: overv/openstreetmap-tile-server
+    container_name: tileserver
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      - THREADS=4
+      - UPDATES=disabled
+    volumes:
+      - ./tileserver-data:/var/lib/postgresql/12/main
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tiles.rule=Host(`${TILESERVER_DOMAIN}`)
+      - traefik.http.routers.tiles.entrypoints=websecure
+      - traefik.http.routers.tiles.tls=true
+      - traefik.http.services.tiles.loadbalancer.server.port=80
+
